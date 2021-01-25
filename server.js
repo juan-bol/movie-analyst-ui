@@ -98,4 +98,65 @@ app.get('/pendings', function(req, res){
     })
 })
 
+console.log("runnning");
+
+app.get('/pendings', function(req, res){
+  request
+    .get('http://'+backendHost+':3000/pendings')
+    .end(function(err, data) {
+      try{
+        if(data.status == 403){
+          res.send(403, '403 Forbidden');
+        } else {
+          var pendings = data.body;
+          res.render('pendings', {pendings : pendings});
+        }
+      }
+      catch(err){
+        console.log(err);
+      } 
+    })
+})
+
+
+// app.get('/ip', function(req, res){
+//   request
+//     .get('https://api.ipify.org/?format=jsonp&callback=getIP')
+//     .end(function(err, data) {
+//       try{
+//         if(data.status == 403){
+//           res.send(403, '403 Forbidden');
+//         } else {
+//           console.log(data.body);
+//         }
+//       }
+//       catch(err){
+//         console.log(err);
+//       } 
+//     })
+// })
+
+
+// var exec = require('child_process').exec, child;
+
+// child = exec("ifconfig eth1 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'",
+//     function (error, stdout, stderr) {
+//         console.log(stdout);
+//         if (error !== null) {
+//              console.log('exec error: ' + error);
+//         }
+//     });
+
+
+  const execSync = require('child_process').execSync;
+  // import { execSync } from 'child_process';  // replace ^ if using ES modules
+    
+  function getIp() {
+    return execSync('ls -l', { encoding: 'utf-8' });  // the default is 'buffer'
+  }
+    
+  console.log(getIp());
+
+
+
 app.listen(3030);
