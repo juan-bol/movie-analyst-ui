@@ -12,11 +12,24 @@ app.set('views', __dirname + '/public/views/');
 // This tells Express out of which directory to serve static assets like CSS and images
 app.use(express.static(__dirname + '/public'));
 
-
-
 // The homepage route of our application does not interface with the MovieAnalyst API and is always accessible. We won’t use the getAccessToken middleware here. We’ll simply render the index.ejs view.
 app.get('/', function(req, res){
-  res.render('index', {api_ip: "API IP"});
+  request
+    .get('http://'+backendHost+':3000/ip')
+    .end(function(err, data) {
+      try{
+        if(data.status == 403){
+          res.send(403, '403 Forbidden');
+        } else {
+          var api_ip = data.body[0];
+          res.render('index', {api_ip: api_ip});
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+      
+    })
 })
 
 // For the movies route, we’ll call the getAccessToken middleware to ensure we have an access token. If we do have a valid access_token, we’ll make a request with the superagent library and we’ll be sure to add our access_token in an Authorization header before making the request to our API.
@@ -97,22 +110,5 @@ app.get('/pendings', function(req, res){
       } 
     })
 })
-
-function getApiIp(){
-  request
-    .get('http://'+backendHost+':3000/ip')
-    .end(function(err, data) {
-      try{
-        if(data.status == 403){
-          res.send(403, '403 Forbidden');
-        } else {
-          return data.body.ip
-        }
-      }
-      catch(err){
-        console.log(err);
-      } 
-    })
-};
 
 app.listen(3030);
